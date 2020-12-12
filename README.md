@@ -1,13 +1,13 @@
-#------------------------------------------------------------
+# ------------------------------------------------------------
 
-#******************* INSTALL INITIAL INFRASTRUCTURE : EC2 INSTANCES ; DOCKER , KUBERNETES (kubctl) and RANCHER
+# ******************* INSTALL INITIAL INFRASTRUCTURE : EC2 INSTANCES ; DOCKER , KUBERNETES (kubctl) and RANCHER
 
 #
 # ANSIBLE
 #
 
-# Just need to run wrapped script to prepare inventory file (clean) and run Ansible playbook to create the initial infrastructure : -( inventory file hosts will be filled with EC2 IPs in create role )
-# playbook roles :
+#- Just need to run wrapped script to prepare inventory file (clean) and run Ansible playbook to create the initial infrastructure : -( inventory file hosts will be filled with EC2 IPs in create role )
+#- playbook roles :
 #- create = provising EC2 instances : 1 Rancher servers, 3 Kubernetes servers ( to be used as cluster )
 #- domain = create Zone DNS gacluccati-devops.link and all needed records to run Rancher and ALL apps using DNS ( Ex: rancher.gacluccati-devops.link , traefik.rancher.gacluccati-devops.link, ... )
 #- setup  = install all needed packages ( docker, kubernetes, rancher ) and prepare servers to receive further configuration described below
@@ -16,24 +16,22 @@
 
 ./ansible.sh
 
-#
-# ONCE EC2 instances and Docker ARE INSTALLED by Ansible, and Rancher is installed as container by Docker also by Ansible, all next infrastructure is set from Rancher, kubectl CLI and apps GUIs
-#
+#- ONCE EC2 instances and Docker ARE INSTALLED by Ansible, and Rancher is installed as container by Docker also by Ansible, all next infrastructure is set from Rancher, kubectl CLI and apps GUIs
 
-#------------------------------------------------------------
+# ------------------------------------------------------------
 
-#******************* CREATE KUBERNETE CLUSTER
+# ******************* CREATE KUBERNETE CLUSTER
 
 #
 # RANCHER ( http://rancher.gacluccati-devops.link )
 #
 
 # 1) CREATE cluster ( suggested name = rancherkub ) in Global area, by click on 'Add Cluster' button.
-# IMPORTANT: during custom cluster creation, on Advanced Option, click on 'Disabled' on Nginx Ingress
-# On this solution we will use Traefik ingress
+#- IMPORTANT: during custom cluster creation, on Advanced Option, click on 'Disabled' on Nginx Ingress
+#- On this solution we will use Traefik ingress
 
 # 2) EXTRACT docker command to create kubernetes cluster
-# RUN in each k8s server changing var NODE_NAME ( k8s-1, k8s-2, k8s-3 )
+#- RUN in each k8s server changing var NODE_NAME ( k8s-1, k8s-2, k8s-3 )
 
 #EX:
 
@@ -154,14 +152,14 @@ contexts:
 
 current-context: "rancherkub"
 
-#******************* IMPLEMENT VOLUME MANAGEMENT SYSTEM ( Rancher Longhorn )
+# ******************* IMPLEMENT VOLUME MANAGEMENT SYSTEM ( Rancher Longhorn )
 
 # 4) Rancher Longhorn (Persistent Volume) - Install Rancher Longhorn to manage Persistent Volume
-# ... the idea on having Persistent Volume is to save data of containers and do not lose them in case container is removed... a new container just use that volume once created and data will not be lost
+#- ... the idea on having Persistent Volume is to save data of containers and do not lose them in case container is removed... a new container just use that volume once created and data will not be lost
 
-# on Rancher GUI, cluster created in first step ( name suggested as rancherkub ), select space defaul and just click on 'Apps' and install Rancher Longhorn from it.
+#- on Rancher GUI, cluster created in first step ( name suggested as rancherkub ), select space defaul and just click on 'Apps' and install Rancher Longhorn from it.
 
-#------------------------------------------------------------
+# ------------------------------------------------------------
 
 #
 # kubectl CLI
@@ -173,7 +171,7 @@ current-context: "rancherkub"
 
 kubectl apply -f setup/mariadb-longhorn-volume.yml
 
-#******************* IMPLEMENT INGRESS
+# ******************* IMPLEMENT INGRESS
 
 # 2) Traefik (DNS) - Install Traefik to be used as ingress in Kubernetes cluster by using kubectl CLI
 
@@ -182,7 +180,7 @@ kubectl apply -f setup/mariadb-longhorn-volume.yml
 kubectl apply -f https://raw.githubusercontent.com/containous/traefik/v1.7/examples/k8s/traefik-rbac.yaml
 kubectl apply -f https://raw.githubusercontent.com/containous/traefik/v1.7/examples/k8s/traefik-ds.yaml
 
-# ... once Traefik is installed, we need to finish setup by setting the Traefik URL ( file setup/traefik.yml )
+#- ... once Traefik is installed, we need to finish setup by setting the Traefik URL ( file setup/traefik.yml )
 
 #DEPLOY:
 
@@ -212,7 +210,7 @@ spec:
             serviceName: graylog
             servicePort: 9000
 
-#******************* IMPLEMENT LOG MANAGEMENT SYSTEM
+# ******************* IMPLEMENT LOG MANAGEMENT SYSTEM
 
 # 3) Graylog - Install centralized system to check containers logs
 
@@ -220,13 +218,13 @@ spec:
 
 kubectl apply -f setup/graylog.yml
 
-#------------------------------------------------------------
+# ------------------------------------------------------------
 
 #
 # GRAYLOG
 #
 
-# Once graylog pod installed ( previous step ), we need to make some configuration via Graylog GUI
+#- Once graylog pod installed ( previous step ), we need to make some configuration via Graylog GUI
 
 # 1)  Create admin user : <user> / <passwd>
 # 2)  Click on System -> Input : this is to create an object in Graylog that will receive traffic from container fluentd (fluentd is one of containers belong to Graylog)
@@ -238,4 +236,4 @@ kubectl apply -f setup/graylog.yml
 
 # The tool is configured .. you may click on button 'Search' on top menu to see the metrics... click on 'Sources' also... explore the tool.
 
-#------------------------------------------------------------
+# ------------------------------------------------------------
