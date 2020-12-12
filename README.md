@@ -1,6 +1,6 @@
 # ------------------------------------------------------------
 
-# ******************* INSTALL INITIAL INFRASTRUCTURE : EC2 INSTANCES ; DOCKER , KUBERNETES (kubctl) and RANCHER
+# *** INSTALL INITIAL INFRASTRUCTURE : EC2 INSTANCES ; DOCKER , KUBERNETES (kubctl) and RANCHER
 
 #
 # ANSIBLE
@@ -20,7 +20,7 @@
 
 # ------------------------------------------------------------
 
-# ******************* CREATE KUBERNETE CLUSTER
+# *** CREATE KUBERNETE CLUSTER
 
 #
 # RANCHER ( http://rancher.< your domain > )
@@ -152,7 +152,7 @@ contexts:
 
 current-context: "rancherkub"
 
-# ******************* IMPLEMENT VOLUME MANAGEMENT SYSTEM ( Rancher Longhorn )
+# *** IMPLEMENT VOLUME MANAGEMENT SYSTEM ( Rancher Longhorn )
 
 # 4) Rancher Longhorn (Persistent Volume) - Install Rancher Longhorn to manage Persistent Volume
 #- ... the idea on having Persistent Volume is to save data of containers and do not lose them in case container is removed... a new container just use that volume once created and data will not be lost
@@ -171,7 +171,7 @@ current-context: "rancherkub"
 
 kubectl apply -f setup/mariadb-longhorn-volume.yml
 
-# ******************* IMPLEMENT INGRESS
+# *** IMPLEMENT INGRESS
 
 # 2) Traefik (DNS) - Install Traefik to be used as ingress in Kubernetes cluster by using kubectl CLI
 
@@ -210,7 +210,7 @@ spec:
             serviceName: graylog
             servicePort: 9000
 
-# ******************* IMPLEMENT LOG MANAGEMENT SYSTEM
+# *** IMPLEMENT LOG MANAGEMENT SYSTEM
 
 # 3) Graylog - Install centralized system to check containers logs
 
