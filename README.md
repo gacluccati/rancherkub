@@ -9,7 +9,7 @@
 #- Just need to run wrapped script to prepare inventory file (clean) and run Ansible playbook to create the initial infrastructure : -( inventory file hosts will be filled with EC2 IPs in create role )
 #- playbook roles :
 #- create = provising EC2 instances : 1 Rancher servers, 3 Kubernetes servers ( to be used as cluster )
-#- domain = create Zone DNS gacluccati-devops.link and all needed records to run Rancher and ALL apps using DNS ( Ex: rancher.gacluccati-devops.link , traefik.rancher.gacluccati-devops.link, ... )
+#- domain = create Zone DNS < your domain > and all needed records to run Rancher and ALL apps using DNS ( Ex: rancher.< your domain > , traefik.rancher.< your domain >, ... )
 #- setup  = install all needed packages ( docker, kubernetes, rancher ) and prepare servers to receive further configuration described below
 
 #RUN:
@@ -23,7 +23,7 @@
 # ******************* CREATE KUBERNETE CLUSTER
 
 #
-# RANCHER ( http://rancher.gacluccati-devops.link )
+# RANCHER ( http://rancher.< your domain > )
 #
 
 # 1) CREATE cluster ( suggested name = rancherkub ) in Global area, by click on 'Add Cluster' button.
@@ -37,7 +37,7 @@
 
 NODE_NAME=k8s-1
 
-sudo docker run -d --privileged --restart=unless-stopped --net=host -v /etc/kubernetes:/etc/kubernetes -v /var/run:/var/run rancher/rancher-agent:v2.4.3 --server https://rancher.gacluccati-devops.link --token gzc4ft52g8rqx6f47vhtkfdzzvh25fqvtgcszqqnvcjr5j4xzc2zls --ca-checksum 38739db300042ff4623b88d7bc535f93052aa4eb97a3990f0b7119eca699c05a --etcd --controlplane --worker --node-name ${NODE_NAME}
+sudo docker run -d --privileged --restart=unless-stopped --net=host -v /etc/kubernetes:/etc/kubernetes -v /var/run:/var/run rancher/rancher-agent:v2.4.3 --server https://rancher.< your domain > --token gzc4ft52g8rqx6f47vhtkfdzzvh25fqvtgcszqqnvcjr5j4xzc2zls --ca-checksum 38739db300042ff4623b88d7bc535f93052aa4eb97a3990f0b7119eca699c05a --etcd --controlplane --worker --node-name ${NODE_NAME}
 
 # 3) CLICK ON 'Kubeconfig File' button, once you clicked on cluster dashboard you generated on step 1, to generate kubectl config and install it on Rancher linux server ( ~/.kube/config )
 
@@ -48,7 +48,7 @@ kind: Config
 clusters:
 - name: "rancherkub"
   cluster:
-    server: "https://rancher.gacluccati-devops.link/k8s/clusters/c-prxbd"
+    server: "https://rancher.< your domain >/k8s/clusters/c-prxbd"
     certificate-authority-data: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJpVENDQ\
       VM2Z0F3SUJBZ0lCQURBS0JnZ3Foa2pPUFFRREFqQTdNUnd3R2dZRFZRUUtFeE5rZVc1aGJXbGoKY\
       kdsemRHVnVaWEl0YjNKbk1Sc3dHUVlEVlFRREV4SmtlVzVoYldsamJHbHpkR1Z1WlhJdFkyRXdIa\
@@ -187,7 +187,7 @@ kubectl apply -f https://raw.githubusercontent.com/containous/traefik/v1.7/examp
 kubectl apply -f setup/traefik.yml
 
 grep host setup/traefik.yml
-  - host: traefik.rancher.gacluccati-devops.link
+  - host: traefik.rancher.< your domain >
 
 # FROM THAT POINT ON, ALL ADDITIONAL TOOL OR APPLICATION THAT WILL BE DEPLOYED, IN ORDER TO BE ACCESSED THROUGH DNS (URL) WILL NEED TO HAVE MODULE 'kind: Ingress' IN THEIR YALM MANIFEST FILE
 
@@ -202,7 +202,7 @@ metadata:
     allow.http: "false"
 spec:
   rules:
-  - host: graylog.rancher.gacluccati-devops.link
+  - host: graylog.rancher.< your domain >
     http:
       paths:
         - path: /
