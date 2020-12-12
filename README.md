@@ -7,7 +7,9 @@
 #
 
 #- Just need to run wrapped script to prepare inventory file (clean) and run Ansible playbook to create the initial infrastructure : -( inventory file hosts will be filled with EC2 IPs in create role )
+
 #- playbook roles :
+
 #- create = provising EC2 instances : 1 Rancher servers, 3 Kubernetes servers ( to be used as cluster )
 #- domain = create Zone DNS < your domain > and all needed records to run Rancher and ALL apps using DNS ( Ex: rancher.< your domain > , traefik.rancher.< your domain >, ... )
 #- setup  = install all needed packages ( docker, kubernetes, rancher ) and prepare servers to receive further configuration described below
