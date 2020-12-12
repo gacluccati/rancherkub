@@ -1,0 +1,15 @@
+---
+
+- name: DevOps RancherKub - Create AWS EC2 instances and domain gacluccati-devops.link
+  become: false
+  hosts: local
+  roles:
+          - create
+          - domain
+
+- name: DevOps RancherKub - Setup AWS EC2 instances with Docker , Kubernetes and Rancher
+  hosts: aws_hosts
+  roles:
+          - setup
+
+...

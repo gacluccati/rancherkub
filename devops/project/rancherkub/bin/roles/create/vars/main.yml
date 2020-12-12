@@ -1,0 +1,16 @@
+---
+# vars file for create
+
+# ubuntu 20
+#image: ami-0c3c87b7d583d618f
+# ubuntu 16
+image: ami-0571ef526d491f232
+
+instance_type: t2.medium
+security_group: gacluccatigroup
+keypair: gacluccati-key
+region: sa-east-1
+k8s_count: 3
+
+#ami-0739f8cdb239fe9ae
+#us-east-1

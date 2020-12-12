@@ -1,0 +1,90 @@
+---
+
+- name: Create Security Group
+  local_action:
+          module: ec2_group
+          name: "{{ security_group }}"
+          description: Security Group
+          region: "{{ region }}"
+          rules:
+                  - proto: all
+                    cidr_ip: 0.0.0.0/0
+          rules_egress:
+                  - proto: all
+                    cidr_ip: 0.0.0.0/0
+  register: basic_firewall
+
+- name: Create EC2 Rancher instance
+  local_action: 
+         module: ec2
+         group: "{{ security_group }}"
+         instance_type: "{{ instance_type }}"
+         image: "{{ image }}"
+         volumes:
+                 - device_name: /dev/sda1
+                   volume_type: standard
+                   volume_size: 30
+         wait: true
+         region: "{{ region }}"
+         keypair: "{{ keypair }}"
+         count: 1
+         instance_tags: Name=RancherServer
+  register: ec2_rancher
+
+- name: Create EC2 Kubernetes clustered instances
+  local_action: 
+         module: ec2
+         group: "{{ security_group }}"
+         instance_type: "{{ instance_type }}"
+         image: "{{ image }}"
+         volumes:
+                 - device_name: /dev/sda1
+                   volume_type: standard
+                   volume_size: 30
+         wait: true
+         region: "{{ region }}"
+         keypair: "{{ keypair }}"
+         count: "{{ k8s_count }}"
+  register: ec2_k8s
+
+- name: Add instances into temp inventary
+  add_host: name={{ item.public_ip }} groups=gacluccatigroup-new
+  with_items: [ "{{ ec2_rancher.instances }}", "{{ ec2_k8s.instances }}" ]
+
+- name: Add Rancher instance into local hosts file
+  local_action: lineinfile
+         state=present
+         path="./hosts"
+         insertafter='^\[rancher_host\]'
+         line={{ item.public_ip }}
+  with_items: "{{ ec2_rancher.instances }}"
+
+- name: Add Kubernetes instances into local hosts file
+  local_action: lineinfile
+         state=present
+         path="./hosts"
+         insertafter='^\[k8s_host\]'
+         line={{ item.public_ip }}
+  with_items: "{{ ec2_k8s.instances }}"
+
+# once hosts file has been changed, it needs to be refreshed to avoid further issues
+- meta: refresh_inventory
+
+- name: Wait for SSH startup
+  local_action: wait_for
+         host={{ item.public_ip }}
+         port=22
+         state=started
+  with_items: [ "{{ ec2_rancher.instances }}", "{{ ec2_k8s.instances }}" ]
+
+- name: Add instance tag in Kubernetes EC2
+  local_action: ec2_tag resource={{ item.id }} region={{ region }} state=present
+  args:
+          tags: Name=k8s-{{ ansible_loop.index }}
+  loop: "{{ ec2_k8s.instances }}"
+  loop_control:
+          extended: yes
+
+  #with_sequence: start=1 end={{ k8s_count }} stride=1 format=k8s-%02x
+                  
+...

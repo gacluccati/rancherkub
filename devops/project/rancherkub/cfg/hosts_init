@@ -1,0 +1,14 @@
+[local]
+localhost ansible_connection=local ansible_python_interpreter=python gather_facts=false
+
+[aws_hosts:vars]
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_user=ubuntu
+
+[aws_hosts:children]
+rancher_host
+k8s_hosts
+
+[rancher_host]
+
+[k8s_hosts]

@@ -1,0 +1,37 @@
+---
+
+# tasks file for setup
+
+- name: Add kubernetes repository to install kubectl in Rancher server
+  shell: curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+  args:
+          warn: false
+  when: "'rancher_host' in group_names"
+
+- name: Update SO
+  apt: state=latest update_cache=yes
+
+- name: Install docker by Rancher
+  shell: curl {{ docker_src }} | sh
+  args:
+          warn: false
+  notify: Enable main server user to run docker
+
+- name: Install needed packages in all servers
+  apt: name={{ rancherkub_packages }} state=latest
+
+- name: Install needed packages in Rancher server
+  apt: name={{ rancher_packages }} state=latest
+  when: "'rancher_host' in group_names"
+
+- name: Install docker-compose in Rancher server from github
+  shell: curl -L "{{ docker_compose_src }}-$( uname -s )-$( uname -m )" -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && ln -sfn /usr/local/bin/docker-compose /usr/bin/docker-compose
+  args:
+          warn: false
+  when: "'rancher_host' in group_names"
+  notify: Install Rancher-Single Node as container in Rancher server
+
+- name: Copy YAML files of components to be used by kubectl
+  copy: src=setup dest=/home/ubuntu/ force=yes owner=ubuntu group=ubuntu
+
+...

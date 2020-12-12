@@ -1,0 +1,6 @@
+---
+# vars file for setup---
+docker_src: https://releases.rancher.com/install-docker/18.09.sh
+docker_compose_src: https://github.com/docker/compose/releases/download/1.25.5/docker-compose 
+
+...

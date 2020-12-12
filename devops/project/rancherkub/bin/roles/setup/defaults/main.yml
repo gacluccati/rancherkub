@@ -1,0 +1,13 @@
+---
+# defaults file for setup
+force_apt_get: True
+
+rancherkub_packages:
+        - git
+
+rancher_packages:
+        - apt-transport-https
+        - gnupg2
+        - kubectl
+  
+...

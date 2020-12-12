@@ -1,0 +1,15 @@
+---
+# handlers file for setup---
+
+- name: Enable main server user to run docker
+  command: usermod -aG docker {{ ansible_ssh_user }}
+  args:
+          warn: false
+
+- name: Install Rancher-Single Node as container in Rancher server
+  become: yes
+  shell: docker run -d --name rancher --restart=unless-stopped -v /opt/rancher:/var/lib/rancher -p 80:80 -p 443:443 rancher/rancher:v2.4.3
+  args:
+          warn: false
+
+...

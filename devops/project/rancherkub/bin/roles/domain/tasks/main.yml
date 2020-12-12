@@ -1,0 +1,33 @@
+---
+
+- name: DNS - Create gacluccati-devops.link DNS public zone
+  local_action:
+          module: route53_zone
+          zone: gacluccati-devops.link
+          comment: Rancherub Devops DNS Zone
+
+- name: DNS - Add rancher.gacluccati-devops.link as A record with Rancher EC2 public IP from inventory
+  local_action:
+          module: route53
+          state: present
+          overwrite: yes
+          zone: gacluccati-devops.link
+          record: "rancher.gacluccati-devops.link"
+          type: A
+          ttl: 300
+          value: "{{ lookup('inventory_hostnames', 'rancher_host', wantlist=True) }}"
+          wait: yes
+
+- name: DNS - Add *.rancher.gacluccati-devops.link as A record with Kubernetes EC2 public IPs from inventory
+  local_action:
+          module: route53
+          state: present
+          overwrite: yes
+          zone: gacluccati-devops.link
+          record: "*.rancher.gacluccati-devops.link"
+          type: A
+          ttl: 300
+          value: "{{ lookup('inventory_hostnames', 'k8s_hosts', wantlist=True) }}"
+          wait: yes
+
+...
